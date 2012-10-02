@@ -14,6 +14,7 @@
 //========================================================================
 package de.mytoys.maven.plugins.jspc;
 
+import org.apache.jasper.JasperException;
 import org.apache.jasper.JspC;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -183,6 +184,12 @@ public class JspcMojo extends AbstractMojo {
 	 * @parameter default-value="false"
 	 */
 	private boolean ignoreJspFragmentErrors;
+    /**
+     * Whether or not to stop on the first compilation error.
+     * 
+     * @parameter default-value="true"
+     */
+    private boolean stopOnFirstCompileError;
 	/**
 	 * Allows a prefix to be appended to the standard schema locations so that
 	 * they can be loaded from elsewhere.
@@ -207,6 +214,7 @@ public class JspcMojo extends AbstractMojo {
 			getLog().info("suppressSmap=" + suppressSmap);
 			getLog().info("ignoreJspFragmentErrors=" + ignoreJspFragmentErrors);
 			getLog().info("schemaResourcePrefix=" + schemaResourcePrefix);
+            getLog().info("stopOnFirstCompileError=" + stopOnFirstCompileError);
 		}
 		try {
 			long start = System.currentTimeMillis();
@@ -281,12 +289,42 @@ public class JspcMojo extends AbstractMojo {
 			jspc.setVerbose(0);
 		}
 
+		List<Exception> exceptions = new ArrayList<Exception>();
 		for (String fileName : jspFiles) {
-			jspc.setJspFiles(fileName);
-			getLog().info("Compiling " + fileName);
-			jspc.execute();
+            getLog().info("Compiling " + fileName);
+            if (stopOnFirstCompileError) {
+                try {
+                    // to recover from exception, we need a new JspC Object :-(
+                    jspc = new JspC();
+                    jspc.setWebXmlFragment(webXmlFragment);
+                    jspc.setUriroot(webAppSourceDirectory);
+                    jspc.setPackage(packageRoot);
+                    jspc.setOutputDir(generatedClasses);
+                    jspc.setValidateXml(validateXml);
+                    jspc.setClassPath(classpathStr.toString());
+                    jspc.setCompile(true);
+                    jspc.setSmapSuppressed(suppressSmap);
+                    jspc.setSmapDumped(!suppressSmap);
+                    jspc.setJavaEncoding(javaEncoding);
+                    jspc.setJspFiles(fileName);
+                    if (verbose) {
+                        jspc.setVerbose(99);
+                    } else {
+                        jspc.setVerbose(0);
+                    }
+                    jspc.execute();
+                } catch (JasperException e) {
+                    getLog().error("Compilation error:" + e.getMessage());
+			        exceptions.add(e);
+			    }
+			} else {
+			    jspc.execute();			    
+			}
 		}
 
+		if (exceptions.size() > 0) {
+		    throw new MojoExecutionException("At least one jsp did not compile!") ;
+		}
 
 		Thread.currentThread().setContextClassLoader(currentClassLoader);
 	}
