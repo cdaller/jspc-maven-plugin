@@ -323,7 +323,7 @@ public class JspcMojo extends AbstractMojo {
 		}
 
 		if (exceptions.size() > 0) {
-		    throw new MojoExecutionException("At least one jsp did not compile!") ;
+		    throw new MojoExecutionException(exceptions.size() + " jsp file(s) did not compile!") ;
 		}
 
 		Thread.currentThread().setContextClassLoader(currentClassLoader);
