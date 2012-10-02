@@ -294,28 +294,28 @@ public class JspcMojo extends AbstractMojo {
             getLog().info("Compiling " + fileName);
             if (stopOnFirstCompileError) {
                 try {
-                    // to recover from exception, we need a new JspC Object :-(
-                    jspc = new JspC();
-                    jspc.setWebXmlFragment(webXmlFragment);
-                    jspc.setUriroot(webAppSourceDirectory);
-                    jspc.setPackage(packageRoot);
-                    jspc.setOutputDir(generatedClasses);
-                    jspc.setValidateXml(validateXml);
-                    jspc.setClassPath(classpathStr.toString());
-                    jspc.setCompile(true);
-                    jspc.setSmapSuppressed(suppressSmap);
-                    jspc.setSmapDumped(!suppressSmap);
-                    jspc.setJavaEncoding(javaEncoding);
-                    jspc.setJspFiles(fileName);
-                    if (verbose) {
-                        jspc.setVerbose(99);
-                    } else {
-                        jspc.setVerbose(0);
-                    }
                     jspc.execute();
                 } catch (JasperException e) {
                     getLog().error("Compilation error:" + e.getMessage());
 			        exceptions.add(e);
+			        // to recover from exception, we need a new JspC Object :-(
+			        jspc = new JspC();
+			        jspc.setWebXmlFragment(webXmlFragment);
+			        jspc.setUriroot(webAppSourceDirectory);
+			        jspc.setPackage(packageRoot);
+			        jspc.setOutputDir(generatedClasses);
+			        jspc.setValidateXml(validateXml);
+			        jspc.setClassPath(classpathStr.toString());
+			        jspc.setCompile(true);
+			        jspc.setSmapSuppressed(suppressSmap);
+			        jspc.setSmapDumped(!suppressSmap);
+			        jspc.setJavaEncoding(javaEncoding);
+			        jspc.setJspFiles(fileName);
+			        if (verbose) {
+			            jspc.setVerbose(99);
+			        } else {
+			            jspc.setVerbose(0);
+			        }
 			    }
 			} else {
 			    jspc.execute();			    
