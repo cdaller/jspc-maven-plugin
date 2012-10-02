@@ -294,6 +294,7 @@ public class JspcMojo extends AbstractMojo {
             getLog().info("Compiling " + fileName);
             if (stopOnFirstCompileError) {
                 try {
+                    jspc.setJspFiles(fileName);
                     jspc.execute();
                 } catch (JasperException e) {
                     getLog().error("Compilation error:" + e.getMessage());
@@ -310,7 +311,6 @@ public class JspcMojo extends AbstractMojo {
 			        jspc.setSmapSuppressed(suppressSmap);
 			        jspc.setSmapDumped(!suppressSmap);
 			        jspc.setJavaEncoding(javaEncoding);
-			        jspc.setJspFiles(fileName);
 			        if (verbose) {
 			            jspc.setVerbose(99);
 			        } else {
