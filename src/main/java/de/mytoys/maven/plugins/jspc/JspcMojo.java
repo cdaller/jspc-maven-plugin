@@ -200,7 +200,7 @@ public class JspcMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (getLog().isDebugEnabled()) {
-			getLog().info("verbose=" + verbose);
+		    getLog().info("verbose=" + verbose);
 			getLog().info("webAppSourceDirectory=" + webAppSourceDirectory);
 			getLog().info("generatedClasses=" + generatedClasses);
 			getLog().info("webXmlFragment=" + webXmlFragment);
@@ -292,33 +292,33 @@ public class JspcMojo extends AbstractMojo {
 		List<Exception> exceptions = new ArrayList<Exception>();
 		for (String fileName : jspFiles) {
             getLog().info("Compiling " + fileName);
+            jspc.setJspFiles(fileName);
             if (stopOnFirstCompileError) {
+                jspc.execute();             
+			} else {
                 try {
-                    jspc.setJspFiles(fileName);
                     jspc.execute();
                 } catch (JasperException e) {
                     getLog().error("Compilation error:" + e.getMessage());
-			        exceptions.add(e);
-			        // to recover from exception, we need a new JspC Object :-(
-			        jspc = new JspC();
-			        jspc.setWebXmlFragment(webXmlFragment);
-			        jspc.setUriroot(webAppSourceDirectory);
-			        jspc.setPackage(packageRoot);
-			        jspc.setOutputDir(generatedClasses);
-			        jspc.setValidateXml(validateXml);
-			        jspc.setClassPath(classpathStr.toString());
-			        jspc.setCompile(true);
-			        jspc.setSmapSuppressed(suppressSmap);
-			        jspc.setSmapDumped(!suppressSmap);
-			        jspc.setJavaEncoding(javaEncoding);
-			        if (verbose) {
-			            jspc.setVerbose(99);
-			        } else {
-			            jspc.setVerbose(0);
-			        }
-			    }
-			} else {
-			    jspc.execute();			    
+                    exceptions.add(e);
+                    // to recover from exception, we need a new JspC Object :-(
+                    jspc = new JspC();
+                    jspc.setWebXmlFragment(webXmlFragment);
+                    jspc.setUriroot(webAppSourceDirectory);
+                    jspc.setPackage(packageRoot);
+                    jspc.setOutputDir(generatedClasses);
+                    jspc.setValidateXml(validateXml);
+                    jspc.setClassPath(classpathStr.toString());
+                    jspc.setCompile(true);
+                    jspc.setSmapSuppressed(suppressSmap);
+                    jspc.setSmapDumped(!suppressSmap);
+                    jspc.setJavaEncoding(javaEncoding);
+                    if (verbose) {
+                        jspc.setVerbose(99);
+                    } else {
+                        jspc.setVerbose(0);
+                    }
+                }
 			}
 		}
 
