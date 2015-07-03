@@ -298,7 +298,7 @@ public class JspcMojo extends AbstractMojo {
 			} else {
                 try {
                     jspc.execute();
-                } catch (JasperException e) {
+                } catch (Exception e) {
                     getLog().error("Compilation error:" + e.getMessage());
                     exceptions.add(e);
                     // to recover from exception, we need a new JspC Object :-(
